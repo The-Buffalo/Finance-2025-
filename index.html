@@ -1,0 +1,450 @@
+<title>Dasbor Interaktif: Riset Manajemen Keuangan Mahasiswa Internasional NUIST</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<!-- Chosen Palette: Warm Neutrals & Soft Blues/Greens (Base: gray-50, Accent: indigo-600/teal-500) -->
+<!-- Application Structure Plan: Dashboard Layout. The application is divided into 4 main sections: 1. Overview & Sample (Top cards for key metrics), 2. Descriptive Analysis (Bar chart for variable means and Pie chart for sample demographics), 3. Inferential Analysis (Interactive Regression Results section with dynamic text/charts to show H1 & H2 findings), and 4. Conclusion & Recommendations (Static text display). This structure is chosen to guide the user from "Who was studied" to "What was found" in a logical, visual flow, prioritizing the core regression findings. -->
+<!-- Visualization & Content Choices: Summary: Report Info -> Goal -> Viz/Presentation Method -> Interaction -> Justification -> Library/Method - Confirming NO SVG/Mermaid. 1. Sample Demographics -> Organize -> Doughnut/Pie Chart -> Hover Detail -> Visual distribution of N=50 -> Chart.js. 2. Variable Means -> Inform -> Bar Chart -> Hover Detail -> Compare perceived vs behavioral scores -> Chart.js. 3. Regression Tables (H1 & H2) -> Inform/Compare -> Interactive Cards/Dynamic Text/Chart -> Button Toggle (Y1 vs Y2) -> Clarity on which X affects which Y -> Chart.js (for effect magnitude) & Vanilla JS (for dynamic text). 4. Conclusions -> Inform -> Structured HTML text blocks -> None -> Present key takeaways clearly -> HTML/Tailwind. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<style>
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 300px;
+    max-height: 400px;
+}
+@media (min-width: 768px) {
+    .chart-container {
+        height: 350px;
+    }
+}
+</style>
+
+<body class="bg-gray-50 font-sans antialiased text-gray-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-indigo-600 shadow-lg sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl font-bold text-white">Dasbor Interaktif: Studi Keuangan Mahasiswa NUIST</h1>
+            <nav class="mt-2 space-x-4 flex overflow-x-auto whitespace-nowrap">
+                <a href="#overview" class="text-white hover:text-indigo-200 transition duration-150 p-2 rounded-lg">Ikhtisar</a>
+                <a href="#samples" class="text-white hover:text-indigo-200 transition duration-150 p-2 rounded-lg">Sampel & Deskriptif</a>
+                <a href="#analysis" class="text-white hover:text-indigo-200 transition duration-150 p-2 rounded-lg">Analisis Regresi Kunci</a>
+                <a href="#conclusion" class="text-white hover:text-indigo-200 transition duration-150 p-2 rounded-lg">Kesimpulan & Saran</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        <!-- 1. Overview Section -->
+        <section id="overview" class="mb-12">
+            <h2 class="text-3xl font-extrabold text-indigo-700 mb-6 border-b pb-2">Ikhtisar Penelitian</h2>
+            <p class="mb-8 text-lg text-gray-600">
+                Aplikasi ini menyajikan temuan utama dari penelitian kuantitatif mengenai peran fitur penganggaran dan pencatatan otomatis di Alipay/WeChat Pay terhadap disiplin keuangan mahasiswa internasional NUIST. Jelajahi bagian-bagian berikut untuk memahami populasi sampel, persepsi fitur, dan hasil hipotesis kunci.
+            </p>
+
+            <!-- Key Metric Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-teal-500 transition hover:shadow-xl">
+                    <p class="text-sm font-medium text-gray-500">Ukuran Sampel (N)</p>
+                    <p class="text-4xl font-bold text-teal-600 mt-1">50</p>
+                    <p class="text-xs text-gray-400 mt-2">Mahasiswa Internasional NUIST</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-indigo-500 transition hover:shadow-xl">
+                    <p class="text-sm font-medium text-gray-500">Penggunaan Fitur PFM</p>
+                    <p class="text-4xl font-bold text-indigo-600 mt-1">88%</p>
+                    <p class="text-xs text-gray-400 mt-2">Tingkat Adopsi Tinggi pada Sampel</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 transition hover:shadow-xl">
+                    <p class="text-sm font-medium text-gray-500">Skor Kualitas Fitur (X1)</p>
+                    <p class="text-4xl font-bold text-yellow-600 mt-1">4.10</p>
+                    <p class="text-xs text-gray-400 mt-2">Persepsi "Sangat Setuju" (Skala 5)</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-500 transition hover:shadow-xl">
+                    <p class="text-sm font-medium text-gray-500">Sig. Paling Rendah (Hubungan)</p>
+                    <p class="text-4xl font-bold text-red-600 mt-1">0.001</p>
+                    <p class="text-xs text-gray-400 mt-2">Signifikansi Tertinggi untuk H1</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Descriptive Analysis & Sample Profile -->
+        <section id="samples" class="mb-12">
+            <h2 class="text-3xl font-extrabold text-indigo-700 mb-6 border-b pb-2">Profil Sampel dan Skor Deskriptif</h2>
+            <p class="mb-8 text-lg text-gray-600">
+                Bagian ini menunjukkan demografi 50 responden dan rata-rata skor mereka untuk variabel kunci (Kualitas Fitur, Kemudahan Penggunaan, Kepatuhan Anggaran, dan Pengurangan Impulsif).
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-xl shadow-lg">
+                <!-- Chart 1: Variable Means -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-700">Rata-rata Persepsi dan Perilaku (Skala 5)</h3>
+                    <p class="text-sm text-gray-500 mb-4">Persepsi fitur (X1, X2) cenderung lebih tinggi daripada hasil perilaku (Y1, Y2), menunjukkan tantangan dalam menerjemahkan persepsi baik menjadi disiplin sempurna.</p>
+                    <div class="chart-container">
+                        <canvas id="variableMeansChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Sample Demographics - Degree -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-700">Distribusi Sampel Berdasarkan Jenjang Pendidikan</h3>
+                    <p class="text-sm text-gray-500 mb-4">Mayoritas sampel adalah mahasiswa Sarjana, yang mencerminkan fokus penelitian pada mahasiswa tingkat awal yang baru beradaptasi dengan lingkungan keuangan Tiongkok.</p>
+                    <div class="chart-container">
+                        <canvas id="degreeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Inferential Analysis - Interactive Regression -->
+        <section id="analysis" class="mb-12">
+            <h2 class="text-3xl font-extrabold text-indigo-700 mb-6 border-b pb-2">Analisis Regresi Kunci: Hasil Hipotesis</h2>
+            <p class="mb-8 text-lg text-gray-600">
+                Gunakan tombol di bawah untuk melihat secara rinci hasil analisis regresi berganda (Multiple Linear Regression) untuk setiap Variabel Dependen (Y). Hasil ini menentukan variabel independen mana (X1: Kualitas Fitur atau X2: Kemudahan Penggunaan) yang signifikan memengaruhi disiplin keuangan mahasiswa.
+            </p>
+
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+                    <button onclick="displayRegression('Y1')" id="btnY1" class="px-6 py-3 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-md">
+                        Analisis Y1 (Kepatuhan Anggaran)
+                    </button>
+                    <button onclick="displayRegression('Y2')" id="btnY2" class="px-6 py-3 rounded-xl font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition shadow-md">
+                        Analisis Y2 (Pengurangan Impulsif)
+                    </button>
+                </div>
+
+                <div id="regressionResults">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Magnitudo Efek Signifikan (Koefisien Beta)</h3>
+                    <p class="text-sm text-gray-500 mb-4" id="effectChartContext">
+                        Diagram batang ini secara visual membandingkan Koefisien Regresi (B) untuk variabel yang terbukti signifikan dalam model regresi. Nilai B menunjukkan seberapa besar perubahan Y ketika X berubah satu unit.
+                    </p>
+                    <div class="chart-container h-80">
+                        <canvas id="effectMagnitudeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Conclusion & Recommendations -->
+        <section id="conclusion" class="mb-12">
+            <h2 class="text-3xl font-extrabold text-indigo-700 mb-6 border-b pb-2">Kesimpulan Utama dan Saran Praktis</h2>
+            <p class="mb-8 text-lg text-gray-600">
+                Berdasarkan temuan yang didukung secara statistik, penelitian ini menyajikan kesimpulan yang terstruktur dan memberikan rekomendasi yang ditargetkan untuk penyedia layanan FinTech, institusi akademik, dan mahasiswa.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Conclusion Summary -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg border-t-4 border-indigo-500">
+                    <h3 class="text-xl font-bold text-indigo-700 mb-3 flex items-center"><span class="text-3xl mr-2">🎯</span> Kesimpulan Kunci</h3>
+                    <ul class="space-y-4 text-gray-600 list-inside list-disc">
+                        <li>**H1 Terdukung:** Kualitas Fitur (X1) secara signifikan ($p=0.001$) meningkatkan Kepatuhan Anggaran (Y1).</li>
+                        <li>**H2 Terdukung:** Kemudahan Penggunaan (X2) secara signifikan ($p=0.003$) mengurangi Belanja Impulsif (Y2).</li>
+                        <li>Fungsi PFM memiliki dampak positif yang terdiferensiasi (X1 &rarr; Y1, X2 &rarr; Y2).</li>
+                        <li>Kemudahan Akses (X2) lebih penting untuk kontrol impulsif jangka pendek.</li>
+                        <li>Akurasi Data (X1) lebih penting untuk perencanaan dan disiplin jangka panjang (Anggaran).</li>
+                    </ul>
+                </div>
+
+                <!-- Recommendations for FinTech -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg border-t-4 border-teal-500">
+                    <h3 class="text-xl font-bold text-teal-700 mb-3 flex items-center"><span class="text-3xl mr-2">📱</span> Saran untuk FinTech</h3>
+                    <ul class="space-y-4 text-gray-600 list-inside list-disc">
+                        <li>**Fokus Prediktif:** Jangan hanya mencatat pengeluaran historis, tetapi tingkatkan fitur peringatan otomatis/prediktif untuk potensi pengeluaran berlebih.</li>
+                        <li>**Optimasi UI/UX Lintas Budaya:** Jaga agar antarmuka X2 tetap sederhana dan mudah dinavigasi untuk pengguna non-pribumi (internasional) guna memaksimalkan efek pengurangan impulsif.</li>
+                    </ul>
+                </div>
+
+                <!-- Recommendations for Students & NUIST -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg border-t-4 border-yellow-500">
+                    <h3 class="text-xl font-bold text-yellow-700 mb-3 flex items-center"><span class="text-3xl mr-2">🎓</span> Saran untuk NUIST & Mahasiswa</h3>
+                    <ul class="space-y-4 text-gray-600 list-inside list-disc">
+                        <li>**Kurikulum Literasi Keuangan Digital:** Lembaga harus memasukkan pendidikan PFM digital Tiongkok ke dalam orientasi mahasiswa baru.</li>
+                        <li>**Disiplin Aktif Mahasiswa:** Mahasiswa tidak boleh hanya mengandalkan otomatisasi, tetapi harus aktif menggunakan data X1 (Kualitas) untuk merumuskan rencana mingguan/bulanan.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-200 py-6 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            <p>&copy; 2025 NUIST Research Synthesis. Data berdasarkan tesis: SHENG MING YU (202453301017).</p>
+        </div>
+    </footer>
+
+    <script>
+        // Data Laporan Mentah (Disimpan dalam JS Object)
+        const rawData = {
+            sample: {
+                N: 50,
+                undergraduate: 41, // 82%
+                masters: 8, // 16%
+                phd: 1, // 2%
+                usage_yes: 44, // 88%
+                usage_no: 6, // 12%
+                residence: {
+                    '1-2 Tahun': 24, // 48%
+                    '> 2 Tahun': 17, // 34%
+                    '6 Bln - 1 Tahun': 7, // 14%
+                    '< 6 Bulan': 2, // 4%
+                }
+            },
+            means: {
+                labels: ['X1: Kualitas Fitur', 'X2: Kemudahan Penggunaan', 'Y1: Kepatuhan Anggaran', 'Y2: Pengurangan Impulsif'],
+                values: [4.10, 4.00, 3.64, 3.66],
+                colors: ['#34D399', '#4F46E5', '#F59E0B', '#EF4444'], // Teal, Indigo, Yellow, Red
+            },
+            regression: {
+                Y1: {
+                    title: 'Model Y1: Kepatuhan Anggaran (Budget Compliance)',
+                    dependent: 'Y1 (Kepatuhan Anggaran)',
+                    R2: '0.41',
+                    F_sig: '0.000',
+                    result_X1: { B: 0.420, T: 3.51, Sig: 0.001, status: 'Diterima (Signifikan)' },
+                    result_X2: { B: 0.155, T: 1.25, Sig: 0.218, status: 'Ditolak (Tidak Signifikan)' },
+                    conclusion: 'Hipotesis H1 didukung: Kualitas Fitur (X1) secara signifikan memengaruhi seberapa baik mahasiswa mematuhi anggaran mereka. Fitur yang akurat dan real-time sangat penting untuk disiplin anggaran.',
+                    significant_vars: [{ label: 'X1: Kualitas Fitur', B: 0.420, color: '#4F46E5' }]
+                },
+                Y2: {
+                    title: 'Model Y2: Pengurangan Belanja Impulsif (Impulsive Spending Reduction)',
+                    dependent: 'Y2 (Pengurangan Impulsif)',
+                    R2: '0.39',
+                    F_sig: '0.000',
+                    result_X1: { B: 0.120, T: 0.98, Sig: 0.332, status: 'Ditolak (Tidak Signifikan)' },
+                    result_X2: { B: 0.380, T: 3.15, Sig: 0.003, status: 'Diterima (Signifikan)' },
+                    conclusion: 'Hipotesis H2 didukung: Kemudahan Penggunaan (X2) secara signifikan memengaruhi pengurangan belanja impulsif. Kemudahan akses ke cek saldo/anggaran yang cepat bertindak sebagai mekanisme pencegah impulsif.',
+                    significant_vars: [{ label: 'X2: Kemudahan Penggunaan', B: 0.380, color: '#34D399' }]
+                }
+            }
+        };
+
+        let currentRegressionChart;
+        let currentEffectMagnitudeChart;
+
+        // --- CHART INITIALIZATION AND RENDERING ---
+
+        // Chart 1: Variable Means (Bar Chart)
+        function renderVariableMeansChart() {
+            const ctx = document.getElementById('variableMeansChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: rawData.means.labels,
+                    datasets: [{
+                        label: 'Rata-rata Skor (1-5)',
+                        data: rawData.means.values,
+                        backgroundColor: rawData.means.colors,
+                        borderRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            title: { display: true, text: 'Skor Rata-rata (Skala 5)' }
+                        },
+                        x: {
+                            ticks: {
+                                callback: function(value) {
+                                    const label = this.getLabelForValue(value);
+                                    if (label.length > 18) {
+                                        return label.split(' ').join('\n');
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.formattedValue;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 2: Sample Demographics (Doughnut Chart)
+        function renderDegreeChart() {
+            const ctx = document.getElementById('degreeChart').getContext('2d');
+            const data = {
+                labels: ['Sarjana (82%)', 'Master (16%)', 'Doktor (2%)'],
+                datasets: [{
+                    data: [41, 8, 1],
+                    backgroundColor: ['#4F46E5', '#9CA3AF', '#34D399'], // Indigo, Gray, Teal
+                    hoverOffset: 16
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + ' Responden';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 3: Effect Magnitude (Bar Chart - Updated dynamically)
+        function renderEffectMagnitudeChart(data) {
+            const ctx = document.getElementById('effectMagnitudeChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (currentEffectMagnitudeChart) {
+                currentEffectMagnitudeChart.destroy();
+            }
+
+            const chartData = {
+                labels: data.map(item => item.label),
+                datasets: [{
+                    label: 'Koefisien Regresi (B)',
+                    data: data.map(item => item.B),
+                    backgroundColor: data.map(item => item.color),
+                    borderRadius: 8,
+                }]
+            };
+
+            currentEffectMagnitudeChart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Koefisien (B)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.formattedValue;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // --- INTERACTIVE LOGIC ---
+
+        function formatRegressionTable(regData) {
+            return `
+                <h3 class="text-2xl font-bold text-indigo-600 mb-4">${regData.title}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-sm">
+                    <div class="bg-indigo-50 p-4 rounded-lg"><strong>Variabel Dependen:</strong> ${regData.dependent}</div>
+                    <div class="bg-indigo-50 p-4 rounded-lg"><strong>R-Squared (Daya Jelaskan):</strong> ${regData.R2}</div>
+                    <div class="bg-indigo-50 p-4 rounded-lg"><strong>Signifikansi Model (Sig. F):</strong> ${regData.F_sig}</div>
+                </div>
+                
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variabel Independen</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Koefisien B</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">t-Statistik</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Signifikansi (Sig.)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Hipotesis</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr class="${regData.result_X1.Sig <= 0.05 ? 'bg-green-50' : ''}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">X1 (Kualitas Fitur)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${regData.result_X1.B}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${regData.result_X1.T}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-${regData.result_X1.Sig <= 0.05 ? 'green' : 'red'}-600">${regData.result_X1.Sig}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${regData.result_X1.status}</td>
+                        </tr>
+                        <tr class="${regData.result_X2.Sig <= 0.05 ? 'bg-green-50' : ''}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">X2 (Kemudahan Penggunaan)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${regData.result_X2.B}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${regData.result_X2.T}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-${regData.result_X2.Sig <= 0.05 ? 'green' : 'red'}-600">${regData.result_X2.Sig}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${regData.result_X2.status}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="mt-6 p-4 border-l-4 border-indigo-500 bg-indigo-50 text-gray-700">
+                    <p class="font-semibold">Kesimpulan Model:</p>
+                    <p>${regData.conclusion}</p>
+                </div>
+            `;
+        }
+
+        function displayRegression(modelKey) {
+            const resultsDiv = document.getElementById('regressionResults');
+            const btnY1 = document.getElementById('btnY1');
+            const btnY2 = document.getElementById('btnY2');
+            const regData = rawData.regression[modelKey];
+            
+            // Update buttons style
+            btnY1.className = 'px-6 py-3 rounded-xl font-bold transition shadow-md ' + (modelKey === 'Y1' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300');
+            btnY2.className = 'px-6 py-3 rounded-xl font-bold transition shadow-md ' + (modelKey === 'Y2' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300');
+
+            // Update content
+            resultsDiv.innerHTML = formatRegressionTable(regData);
+
+            // Update Effect Magnitude Chart with only significant variables for the selected model
+            renderEffectMagnitudeChart(regData.significant_vars);
+
+            // Update chart context text
+            document.getElementById('effectChartContext').textContent = `Diagram batang ini menunjukkan Koefisien Regresi (B) variabel yang signifikan mempengaruhi ${regData.dependent}. Untuk Model Y1, hanya X1 yang signifikan. Untuk Model Y2, hanya X2 yang signifikan.`;
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            renderVariableMeansChart();
+            renderDegreeChart();
+            // Load Y1 as default view
+            displayRegression('Y1');
+        };
+
+    </script>
+</body>
+</html>
